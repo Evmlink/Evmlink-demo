@@ -4,6 +4,9 @@ import { CHAIN_NAMESPACES, IProvider } from "@web3auth/base";
 import RPC from "./solanaRPC";
 import "./App.css";
 
+//Aptos Link npm
+import {AptosLink} from "@aptoslink/api"
+
 //Aptos
 
 // Plugins
@@ -111,25 +114,6 @@ function App() {
     setProvider(web3authProvider);
   };
 
-  const addChain = async () => {
-    if (!provider) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const newChain = {
-      chainId: "0x2",
-      displayName: "Solana Testnet",
-      chainNamespace: CHAIN_NAMESPACES.SOLANA,
-      tickerName: "SOLANA",
-      ticker: "SOL",
-      decimals: 18,
-      rpcTarget: "https://api.testnet.solana.com",
-      blockExplorer: "https://explorer.solana.com/?cluster=testnet",
-    };
-    await web3auth?.addChain(newChain);
-    uiConsole("New Chain Added");
-  };
-
   const getUserInfo = async () => {
     if (!web3auth) {
       uiConsole("web3auth not initialized yet");
@@ -152,6 +136,9 @@ function App() {
   //Aptos functions
   const aptosConnect = async ( ) =>{
     // await aptos.connect('martian' as WalletName)
+    console.log(window.location.host)
+    var newlink =await AptosLink.create("","https://"+window.location.host+"/","Hello World",true,"");
+    console.log(newlink.url)
   }
 
   function uiConsole(...args: any[]): void {
@@ -199,7 +186,9 @@ function App() {
       <div className="grid">{loggedIn ? loggedInView : unloggedInView}</div>
     
     <div>
-
+    <button onClick={aptosConnect} className="card">
+      Debug Button
+    </button>
     </div>
 
 
