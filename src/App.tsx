@@ -4,6 +4,8 @@ import { CHAIN_NAMESPACES, IProvider } from "@web3auth/base";
 import RPC from "./solanaRPC";
 import "./App.css";
 
+//Aptos
+
 // Plugins
 import { SolanaWalletConnectorPlugin } from "@web3auth/solana-wallet-connector-plugin";
 
@@ -17,6 +19,7 @@ function App() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  // const aptos = useWallet();
 
   useEffect(() => {
     const init = async () => {
@@ -146,6 +149,11 @@ function App() {
     setLoggedIn(false);
   };
 
+  //Aptos functions
+  const aptosConnect = async ( ) =>{
+    // await aptos.connect('martian' as WalletName)
+  }
+
   function uiConsole(...args: any[]): void {
     const el = document.querySelector("#console>p");
     if (el) {
@@ -175,7 +183,7 @@ function App() {
 
   const unloggedInView = (
     <button onClick={login} className="card">
-      Login
+      Connect Wallet
     </button>
   );
 
@@ -183,12 +191,17 @@ function App() {
     <div className="container">
       <h1 className="title">
         <a target="_blank" href="https://github.com/Evmlink/Aptoslink-npm" rel="noreferrer">
-          Web3Auth{" "}
+          Aptoslink{" "}
         </a>
-        & ReactJS For Aptos
+        Demo site
       </h1>
 
       <div className="grid">{loggedIn ? loggedInView : unloggedInView}</div>
+    
+    <div>
+
+    </div>
+
 
       <footer className="footer">
         <a

@@ -4,6 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+//Aptos
+import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
