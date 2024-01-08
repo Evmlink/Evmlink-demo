@@ -22,6 +22,7 @@
     "@web3auth/solana-provider": "^7.2.1",
     "@web3auth/solana-wallet-connector-plugin": "^7.2.1",
     "@web3auth/solflare-adapter": "^7.2.1",
+    "b58": "^4.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
