@@ -28,6 +28,7 @@ function App() {
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [aptosWalletConnected, setAptosWalletConnected] = useState(false);
+  const [webWalletExsitConnected,setWebWalletExsitConnected] = useState(false);
   // const aptos = useWallet();
 
   useEffect(() => {
@@ -115,8 +116,10 @@ function App() {
       //Show what this link means about :
       aptlink = await AptosLink.fromLink(window.location.href)
       console.log("🔥 Found a wallet : ")
-      console.log(aptlink)
-      console.log(aptlink.keypair.accountAddress.toString())
+      // console.log(aptlink)
+      // console.log(aptlink.keypair.accountAddress.toString())
+      setWebWalletExsitConnected(true);
+      webWalletUpdate(aptlink.keypair.accountAddress.toString(),0)
     }
   }
 
@@ -185,6 +188,12 @@ function App() {
     el.innerHTML = data
   }
   
+  function webWalletUpdate(address:string,balance:number): void {
+    console.log("update : ",address)
+    const el = document.querySelector("#webwalletaddress");
+    el.innerHTML = address
+    
+  }
   const loggedInView = (
     <>
       <div className="flex-container">
@@ -216,18 +225,30 @@ function App() {
     </>
   );
 
+  const webWalletExsit = (
+    <>
+      <h3>
+        Web wallet address : <div id="webwalletaddress"></div>
+      </h3>
+      <h3>
+        Balance : <div id="webwalletbalance"></div>
+      </h3>
+    </>
+  )
   return (
     <div className="container">
+
       <h1 className="title">
         <a target="_blank" href="https://github.com/Evmlink/Aptoslink-npm" rel="noreferrer">
           Aptoslink{" "}
         </a>
         Demo site
       </h1>
-
-      <div className="grid">{loggedIn ? loggedInView : unloggedInView}</div>
-    
+      <div className="grid">{webWalletExsitConnected ? webWalletExsit : ""}</div>
     <div>
+
+      
+    <div className="grid">{loggedIn ? loggedInView : unloggedInView}</div>
     <button onClick={aptosConnect} className="card">
       Debug Button
     </button>
