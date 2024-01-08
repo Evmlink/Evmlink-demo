@@ -22,6 +22,7 @@ function App() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [aptosWalletConnected, setAptosWalletConnected] = useState(false);
   // const aptos = useWallet();
 
   useEffect(() => {
@@ -102,7 +103,7 @@ function App() {
 
     if (web3auth.connected) {
       setLoggedIn(true);
-      console.log("🔥 Connected")
+      setAptosWalletConnected(true);
       if (!provider) {
         uiConsole("provider not initialized yet");
         return;
@@ -174,6 +175,16 @@ function App() {
     </button>
   );
 
+  const aptosWalletConnectedView = (
+    <>
+      <div className="flex-container">
+      <h2>
+        Wallet Connected : <a id = 'aptosWalletAddress'></a>
+      </h2>
+      </div>
+    </>
+  );
+
   return (
     <div className="container">
       <h1 className="title">
@@ -190,6 +201,8 @@ function App() {
       Debug Button
     </button>
     </div>
+
+    <div className="grid">{aptosWalletConnected ? aptosWalletConnectedView : ""}</div>
 
 
       <footer className="footer">
