@@ -19,7 +19,6 @@ import { SlopeAdapter } from "@web3auth/slope-adapter";
 
 const clientId = "BCAAiDZXdCWOyncD7Dgtazac1_0C6jQZFxiSKxA-wSv3FW6iFpGi68PW7L5XyE1hRoeeRS3hSh_-rZOg_Ou4eSk"; 
 
-var userAptosAddress="";
 var aptlink : AptosLink;
 
 function App() {
@@ -31,7 +30,7 @@ function App() {
   const [web3authWalletAddress,setWeb3authWalletAddress] = useState("");
   const [web3authWalletAddressExplorer,setWeb3authWalletAddressExplorer] = useState("");
   const [web3authWalletBalance,setweb3authWalletBalance] = useState(0);
-  const [web3authWallet,setWeb3authWallet] = useState({});
+  const [web3authWalletPrivateKey,setWeb3authWalletPrivateKey] = useState("");
 
   const [linkWalletAddress,setLinkWalletAddress] = useState("");
   const [linkWalletExplorer,setLinkWalletExplorer] = useState("");;
@@ -146,7 +145,7 @@ function App() {
         {
           if(bal[i].type=='0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>')
           {
-            return bal[i].data.coin.value
+            return (Number(bal[i].data.coin.value)/100000000) as any
           }
         }
       }
@@ -156,6 +155,23 @@ function App() {
     })
   }
 
+  const withdrawsToWeb3Wallet= async ()=>
+  {
+    console.log("🍺 LINK WALLET :")
+    console.log(linkWallet)
+    console.log("🍺 WEB3AUTH WALLET ADDRESS :")
+    console.log(web3authWalletAddress)
+    const linkwallet = await AptosLink.fromLink(window.location.href);
+    const txn = await AptosLink.transfer(
+      linkwallet,
+      "testnet",
+      10000000,
+      '0xfcce4468c35db14b765d2166fc8cf15b4af9e22a593b95f88f84b4cba36540e4',
+    )
+    console.log(txn)
+  }
+
+
   const login = async () => {
     if (!web3auth) {
       // uiConsole("web3auth not initialized yet");
@@ -164,16 +180,23 @@ function App() {
     const web3authProvider = await web3auth.connect();
 
     if (web3auth.connected) {
+      // setProvider({} as IProvider)
+      setProvider(web3authProvider);
       if (!provider) {
         return;
       }
       setLoggedIn(true);
       const rpc = new RPC(provider);
-      const privateKey = await rpc.getPrivateKey();
+      let privateKey ;
+      if(web3authWalletPrivateKey)
+      {
+        privateKey = web3authWalletPrivateKey;
+      }else{
+        privateKey = await rpc.getPrivateKey();
+      }
       var acc = solanaPrivateKeyToAptosAccount(privateKey);
       console.log("🔥Aptos address : ",acc.accountAddress.toString())
-      setWeb3authWallet(acc);
-
+      setWeb3authWalletPrivateKey(privateKey)
       setWeb3authWalletAddress(acc.accountAddress.toString())
       setweb3authWalletBalance(await getBal(acc.accountAddress.toString()))
       setAptosWalletConnected(true);
@@ -181,6 +204,7 @@ function App() {
     }
     setProvider(web3authProvider);
   };
+
 
   const logout = async () => {
     if (!web3auth) {
@@ -209,33 +233,15 @@ function App() {
     console.log(newlink.url)
   }
 
-  function uiConsole(...args: any[]): void {
-    const el = document.querySelector("#console>p");
-    if (el) {
-      el.innerHTML = JSON.stringify(args || {}, null, 2);
-    }
-  }
-
-  function userAddressUpdate(data:string): void {
-    console.log(data)
-    const el = document.querySelector("#aptosWalletAddress");
-    el.innerHTML = data
-  }
-  
-  function webWalletUpdate(address:string,balance:number): void {
-    console.log("update : ",address)
-    const el = document.querySelector("#webwalletaddress");
-    el.innerHTML = address
-    
-  }
   const loggedInView = (
     <>
       <div className="container">
-        <div>
-          <button onClick={logout} className="card">
-            Disconnect Web3auth
-          </button>
-        </div>
+        <button onClick={withdrawsToWeb3Wallet} className="card">
+              Withdraws To Wallet
+        </button>
+        <button onClick={logout} className="card">
+              Disconnect Web3auth
+        </button>
       </div>
       {/* <div id="console" style={{ whiteSpace: "pre-line" }}>
         <p style={{ whiteSpace: "pre-line" }}>Logged in Successfully!</p>
