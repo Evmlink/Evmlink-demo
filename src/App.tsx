@@ -162,13 +162,27 @@ function App() {
     console.log("🍺 WEB3AUTH WALLET ADDRESS :")
     console.log(web3authWalletAddress)
     const linkwallet = await AptosLink.fromLink(window.location.href);
-    const txn = await AptosLink.transfer(
-      linkwallet,
-      "testnet",
-      10000000,
-      '0xfcce4468c35db14b765d2166fc8cf15b4af9e22a593b95f88f84b4cba36540e4',
-    )
-    console.log(txn)
+    // const txn = await AptosLink.transfer(
+    //   linkwallet,
+    //   "testnet",
+    //   10000000,
+    //   '0xfcce4468c35db14b765d2166fc8cf15b4af9e22a593b95f88f84b4cba36540e4',
+    // )
+    // console.log(txn)
+
+    const aptos = new apt.Aptos(
+      {
+          network:"testnet"
+      } as apt.AptosConfig
+    );
+    const transaction = await aptos.transferCoinTransaction({
+      sender: linkwallet.keypair,
+      recipient: '0xfcce4468c35db14b765d2166fc8cf15b4af9e22a593b95f88f84b4cba36540e4',
+      amount: 10000000
+    });
+    const pendingTransaction = await aptos.signAndSubmitTransaction({ signer: linkwallet.keypair, transaction });
+    return pendingTransaction
+
   }
 
 
@@ -198,6 +212,7 @@ function App() {
       console.log("🔥Aptos address : ",acc.accountAddress.toString())
       setWeb3authWalletPrivateKey(privateKey)
       setWeb3authWalletAddress(acc.accountAddress.toString())
+      setWeb3authWalletAddressExplorer(`https://explorer.aptoslabs.com/account/${acc.accountAddress.toString()}?network=mainnet`)
       setweb3authWalletBalance(await getBal(acc.accountAddress.toString()))
       setAptosWalletConnected(true);
 
