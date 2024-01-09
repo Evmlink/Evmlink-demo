@@ -1,7 +1,8 @@
 {
-  "name": "solana-modal-example",
+  "name": "aptoslink-example",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://github.com/evmlink/aptoslink-demo",
   "dependencies": {
     "@aptos-labs/wallet-adapter-ant-design": "^2.0.0",
     "@aptos-labs/wallet-adapter-core": "^3.3.0",
@@ -23,6 +24,7 @@
     "@web3auth/solana-wallet-connector-plugin": "^7.2.1",
     "@web3auth/solflare-adapter": "^7.2.1",
     "b58": "^4.0.3",
+    "gh-pages": "^6.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -67,6 +69,8 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "lint": "react-scripts lint"
+    "lint": "react-scripts lint",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   }
 }
