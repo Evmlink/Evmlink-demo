@@ -28,6 +28,10 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [aptosWalletConnected, setAptosWalletConnected] = useState(false);
   const [webWalletExsitConnected,setWebWalletExsitConnected] = useState(false);
+  const [web3authWalletAddress,setWeb3authWalletAddress] = useState("");
+  const [web3authWalletAddressExplorer,setWeb3authWalletAddressExplorer] = useState("");
+  const [web3authWalletBalance,setweb3authWalletBalance] = useState(0);
+  const [web3authWallet,setWeb3authWallet] = useState({});
 
   const [linkWalletAddress,setLinkWalletAddress] = useState("");
   const [linkWalletExplorer,setLinkWalletExplorer] = useState("");;
@@ -160,19 +164,20 @@ function App() {
     const web3authProvider = await web3auth.connect();
 
     if (web3auth.connected) {
-      setLoggedIn(true);
-      setAptosWalletConnected(true);
       if (!provider) {
         return;
       }
+      setLoggedIn(true);
       const rpc = new RPC(provider);
       const privateKey = await rpc.getPrivateKey();
-      console.log("🔥 Connected : ",privateKey)
       var acc = solanaPrivateKeyToAptosAccount(privateKey);
-      console.log(acc)
       console.log("🔥Aptos address : ",acc.accountAddress.toString())
-      userAddressUpdate(acc.accountAddress.toString())
-      userAptosAddress = acc.accountAddress.toString();
+      setWeb3authWallet(acc);
+
+      setWeb3authWalletAddress(acc.accountAddress.toString())
+      setweb3authWalletBalance(await getBal(acc.accountAddress.toString()))
+      setAptosWalletConnected(true);
+
     }
     setProvider(web3authProvider);
   };
@@ -225,10 +230,10 @@ function App() {
   }
   const loggedInView = (
     <>
-      <div className="flex-container">
+      <div className="container">
         <div>
           <button onClick={logout} className="card">
-            Disconnect Wallet
+            Disconnect Web3auth
           </button>
         </div>
       </div>
@@ -240,16 +245,19 @@ function App() {
 
   const unloggedInView = (
     <button onClick={login} className="card">
-      Connect Wallet
+      Connect Web3auth
     </button>
   );
 
   const aptosWalletConnectedView = (
     <>
-      <div className="flex-container">
-      <h2>
-        Wallet Connected : <div id ='aptosWalletAddress'></div>
-      </h2>
+      <div className="container">
+      <h3>
+        Web3auth Wallet :  <a href={web3authWalletAddressExplorer}>{web3authWalletAddress}</a>
+      </h3>
+      <h3>
+            Balance : {web3authWalletBalance} APT
+      </h3>
       </div>
     </>
   );
@@ -277,6 +285,7 @@ function App() {
         Demo site
       </h1>
       <div className="grid">{webWalletExsitConnected ? webWalletExsit : ""}</div>
+      <div className="grid">{aptosWalletConnected ? aptosWalletConnectedView : ""}</div>
     <div>
 
       
@@ -285,8 +294,6 @@ function App() {
       Debug Button
     </button>
     </div>
-
-    <div className="grid">{aptosWalletConnected ? aptosWalletConnectedView : ""}</div>
 
 
       <footer className="footer">
