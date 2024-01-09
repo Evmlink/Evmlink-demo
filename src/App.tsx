@@ -16,7 +16,6 @@ import { SolanaWalletConnectorPlugin } from "@web3auth/solana-wallet-connector-p
 // Adapters
 import { SolflareAdapter } from "@web3auth/solflare-adapter";
 import { SlopeAdapter } from "@web3auth/slope-adapter";
-import { off } from "process";
 
 const clientId = "BCAAiDZXdCWOyncD7Dgtazac1_0C6jQZFxiSKxA-wSv3FW6iFpGi68PW7L5XyE1hRoeeRS3hSh_-rZOg_Ou4eSk"; 
 
@@ -29,6 +28,11 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [aptosWalletConnected, setAptosWalletConnected] = useState(false);
   const [webWalletExsitConnected,setWebWalletExsitConnected] = useState(false);
+
+  const [linkWalletAddress,setLinkWalletAddress] = useState("");
+  const [linkWalletExplorer,setLinkWalletExplorer] = useState("");;
+  const [linkWallet,setLinkWallet]= useState({})
+  const [linkWalletBalance,setLinkWalletBalance]= useState(0)
   // const aptos = useWallet();
 
   useEffect(() => {
@@ -115,12 +119,37 @@ function App() {
     }else{
       //Show what this link means about :
       aptlink = await AptosLink.fromLink(window.location.href)
-      console.log("🔥 Found a wallet : ")
-      // console.log(aptlink)
-      // console.log(aptlink.keypair.accountAddress.toString())
+      setLinkWalletAddress(aptlink.keypair.accountAddress.toString())
+      setLinkWalletExplorer(`https://explorer.aptoslabs.com/account/${aptlink.keypair.accountAddress.toString()}?network=mainnet`)
+      setLinkWallet(aptlink);
+      var bal = await getBal(aptlink.keypair.accountAddress.toString())
+      setLinkWalletBalance(bal);
+      console.log(bal)
+      //Draw the page
       setWebWalletExsitConnected(true);
-      webWalletUpdate(aptlink.keypair.accountAddress.toString(),0)
+      // webWalletUpdate(aptlink.keypair.accountAddress.toString(),0)
     }
+  }
+  const getBal = async (address:string)=>
+  {
+    return await fetch( `https://fullnode.testnet.aptoslabs.com/v1/accounts/${address}/resources`, {method: "GET"})
+    .then(res => res.json()) 
+    .then(bal => {
+      
+      if(bal.length>0)
+      {
+        for(var i =0 ; i < bal.length ; i ++)
+        {
+          if(bal[i].type=='0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>')
+          {
+            return bal[i].data.coin.value
+          }
+        }
+      }
+      return 0;
+    })
+    .catch(e => {
+    })
   }
 
   const login = async () => {
@@ -227,12 +256,15 @@ function App() {
 
   const webWalletExsit = (
     <>
-      <h3>
-        Web wallet address : <div id="webwalletaddress"></div>
-      </h3>
-      <h3>
-        Balance : <div id="webwalletbalance"></div>
-      </h3>
+        <div className="container">
+          <h3>
+          Link Wallet : <a href={linkWalletExplorer}>{linkWalletAddress}</a>
+          </h3>
+          <h3>
+            Balance : {linkWalletBalance} APT
+          </h3>
+        </div>
+
     </>
   )
   return (
