@@ -40,6 +40,7 @@ function App() {
 
   useEffect(() => {
     const init = async () => {
+      document.title = "Aptoslink Testnet Demo"
       try {
         const web3auth = new Web3Auth({
           clientId,
@@ -123,7 +124,7 @@ function App() {
       //Show what this link means about :
       aptlink = await AptosLink.fromLink(window.location.href)
       setLinkWalletAddress(aptlink.keypair.accountAddress.toString())
-      setLinkWalletExplorer(`https://explorer.aptoslabs.com/account/${aptlink.keypair.accountAddress.toString()}?network=mainnet`)
+      setLinkWalletExplorer(`https://explorer.aptoslabs.com/account/${aptlink.keypair.accountAddress.toString()}?network=testnet`)
       setLinkWallet(aptlink);
       var bal = await getBal(aptlink.keypair.accountAddress.toString())
       setLinkWalletBalance(bal);
@@ -212,7 +213,7 @@ function App() {
       console.log("🔥Aptos address : ",acc.accountAddress.toString())
       setWeb3authWalletPrivateKey(privateKey)
       setWeb3authWalletAddress(acc.accountAddress.toString())
-      setWeb3authWalletAddressExplorer(`https://explorer.aptoslabs.com/account/${acc.accountAddress.toString()}?network=mainnet`)
+      setWeb3authWalletAddressExplorer(`https://explorer.aptoslabs.com/account/${acc.accountAddress.toString()}?network=testnet`)
       setweb3authWalletBalance(await getBal(acc.accountAddress.toString()))
       setAptosWalletConnected(true);
 
@@ -286,6 +287,8 @@ function App() {
   const webWalletExsit = (
     <>
       <div className="container">
+        <div>Get some APT : Aptos <a href="https://www.aptosfaucet.com/">testnet faucet</a></div>
+        <br></br>
         <div>You can transfer the APT into address <h3>{linkWalletAddress}</h3></div>
         <br></br>
         <div>And send link : 
@@ -312,7 +315,7 @@ function App() {
         <a target="_blank" href="https://github.com/Evmlink/Aptoslink-npm" rel="noreferrer">
           Aptoslink{" "}
         </a>
-        Demo site
+        Testnet Demo site
       </h1>
       <div className="grid">{webWalletExsitConnected ? webWalletExsit : ""}</div>
       <div className="grid">{aptosWalletConnected ? aptosWalletConnectedView : ""}</div>
