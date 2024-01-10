@@ -285,6 +285,15 @@ function App() {
 
   const webWalletExsit = (
     <>
+      <div className="container">
+        <div>You can transfer the APT into address <h3>{linkWalletAddress}</h3></div>
+        <br></br>
+        <div>And send link : 
+          <h3>{window.location.href}</h3>
+           as a cash-gift to your friend !</div>
+        <br></br>
+      </div>
+
         <div className="container">
           <h3>
           Link Wallet : <a href={linkWalletExplorer}>{linkWalletAddress}</a>
@@ -311,9 +320,9 @@ function App() {
 
       
     <div className="grid">{loggedIn ? loggedInView : unloggedInView}</div>
-    <button onClick={aptosConnect} className="card">
+    {/* <button onClick={aptosConnect} className="card">
       Debug Button
-    </button>
+    </button> */}
     </div>
 
 
