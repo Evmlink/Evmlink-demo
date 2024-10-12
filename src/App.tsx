@@ -5,10 +5,9 @@ import RPC from "./solanaRPC";
 import "./App.css";
 
 import * as apt from "@aptos-labs/ts-sdk";
-//Aptos Link npm
-import {AptosLink} from "@aptoslink/api"
 
-//Aptos
+//EVM Link
+import { EvmLink } from '@evmlink/api';
 
 // Plugins
 import { SolanaWalletConnectorPlugin } from "@web3auth/solana-wallet-connector-plugin";
@@ -19,13 +18,13 @@ import { SlopeAdapter } from "@web3auth/slope-adapter";
 
 const clientId = "BCAAiDZXdCWOyncD7Dgtazac1_0C6jQZFxiSKxA-wSv3FW6iFpGi68PW7L5XyE1hRoeeRS3hSh_-rZOg_Ou4eSk"; 
 
-var aptlink : AptosLink;
+var evmlink : EvmLink;
 
 function App() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [aptosWalletConnected, setAptosWalletConnected] = useState(false);
+  const [evmWalletConnected, setEvmWalletConnected] = useState(false);
   const [webWalletExsitConnected,setWebWalletExsitConnected] = useState(false);
   const [web3authWalletAddress,setWeb3authWalletAddress] = useState("");
   const [web3authWalletAddressExplorer,setWeb3authWalletAddressExplorer] = useState("");
@@ -36,11 +35,13 @@ function App() {
   const [linkWalletExplorer,setLinkWalletExplorer] = useState("");;
   const [linkWallet,setLinkWallet]= useState({})
   const [linkWalletBalance,setLinkWalletBalance]= useState(0)
+
+  const chainID = 84532 
   // const aptos = useWallet();
 
   useEffect(() => {
     const init = async () => {
-      document.title = "Aptoslink Testnet Demo"
+      document.title = "Evmlink Testnet Demo"
       try {
         const web3auth = new Web3Auth({
           clientId,
@@ -113,25 +114,28 @@ function App() {
 
   const pageInit = async()=>
   {
-    // console.log("🔥 Init")
+    console.log("🔥 Init")
     if(window.location.pathname=="/")
     {
       //Empy , generate a new link and redirect
-      const newlink = await AptosLink.create("",window.location.href,"Hello World",true,"");
+      const newlink = await EvmLink.create("",window.location.href,true,chainID,"Hello World");
+      console.log("My Link",newlink)
       console.log(newlink.url.href)
       window.location.replace(newlink.url.href)
     }else{
       //Show what this link means about :
-      aptlink = await AptosLink.fromLink(window.location.href)
-      setLinkWalletAddress(aptlink.keypair.accountAddress.toString())
-      setLinkWalletExplorer(`https://explorer.aptoslabs.com/account/${aptlink.keypair.accountAddress.toString()}?network=testnet`)
-      setLinkWallet(aptlink);
-      var bal = await getBal(aptlink.keypair.accountAddress.toString())
+      evmlink = await EvmLink.fromLink(window.location.href)
+      console.log("evmlink",evmlink)
+      setLinkWalletAddress(evmlink.keypair.address)
+      setLinkWalletExplorer(`https://sepolia.basescan.org/address/${evmlink.keypair.address}`)
+      setLinkWallet(evmlink);
+      // var bal = await getBal(evmlink.keypair.accountAddress)
+      var bal = 0
       setLinkWalletBalance(bal);
       console.log(bal)
       //Draw the page
       setWebWalletExsitConnected(true);
-      // webWalletUpdate(aptlink.keypair.accountAddress.toString(),0)
+      // webWalletUpdate(evmlink.keypair.accountAddress.toString(),0)
     }
   }
   const getBal = async (address:string)=>
@@ -162,8 +166,8 @@ function App() {
     console.log(linkWallet)
     console.log("🍺 WEB3AUTH WALLET ADDRESS :")
     console.log(web3authWalletAddress)
-    const linkwallet = await AptosLink.fromLink(window.location.href);
-    // const txn = await AptosLink.transfer(
+    const linkwallet = await EvmLink.fromLink(window.location.href);
+    // const txn = await EvmLink.transfer(
     //   linkwallet,
     //   "testnet",
     //   10000000,
@@ -210,12 +214,13 @@ function App() {
         privateKey = await rpc.getPrivateKey();
       }
       var acc = solanaPrivateKeyToAptosAccount(privateKey);
+      console.log("🍺web3auth privatekey:",privateKey)
       console.log("🔥Aptos address : ",acc.accountAddress.toString())
       setWeb3authWalletPrivateKey(privateKey)
       setWeb3authWalletAddress(acc.accountAddress.toString())
       setWeb3authWalletAddressExplorer(`https://explorer.aptoslabs.com/account/${acc.accountAddress.toString()}?network=testnet`)
       setweb3authWalletBalance(await getBal(acc.accountAddress.toString()))
-      setAptosWalletConnected(true);
+      setEvmWalletConnected(true);
 
     }
     setProvider(web3authProvider);
@@ -230,7 +235,7 @@ function App() {
     await web3auth.logout();
     setProvider(null);
     setLoggedIn(false);
-    setAptosWalletConnected(false)
+    setEvmWalletConnected(false)
   };
 
   const solanaPrivateKeyToAptosAccount=(sk : string) => 
@@ -245,7 +250,7 @@ function App() {
     // await aptos.connect('martian' as WalletName)
     console.log(window.location.host)
     console.log(window.location.pathname=="/")
-    var newlink =await AptosLink.create("","https://"+window.location.host+"/","Hello World",true,"");
+    var newlink =await EvmLink.create("","https://"+window.location.host+"/",true,chainID,"Hello World");
     console.log(newlink.url)
   }
 
@@ -271,14 +276,14 @@ function App() {
     </button>
   );
 
-  const aptosWalletConnectedView = (
+  const evmWalletConnectedView = (
     <>
       <div className="container">
       <h3>
         Web3auth Wallet :  <a href={web3authWalletAddressExplorer}>{web3authWalletAddress}</a>
       </h3>
       <h3>
-            Balance : {web3authWalletBalance} APT
+            Balance : {web3authWalletBalance} TBASE
       </h3>
       </div>
     </>
@@ -287,9 +292,9 @@ function App() {
   const webWalletExsit = (
     <>
       <div className="container">
-        <div>Get some APT : Aptos <a href="https://www.aptosfaucet.com/">testnet faucet</a></div>
+        <div>Get some TBASE : Base <a href="https://faucets.chain.link/base-sepolia">testnet faucet</a></div>
         <br></br>
-        <div>You can transfer the APT into address <h3>{linkWalletAddress}</h3></div>
+        <div>You can transfer the TBASE into address <h3>{linkWalletAddress}</h3></div>
         <br></br>
         <div>And send link : 
           <h3>{window.location.href}</h3>
@@ -302,7 +307,7 @@ function App() {
           Link Wallet : <a href={linkWalletExplorer}>{linkWalletAddress}</a>
           </h3>
           <h3>
-            Balance : {linkWalletBalance} APT
+            Balance : {linkWalletBalance} TBASE
           </h3>
         </div>
 
@@ -312,13 +317,13 @@ function App() {
     <div className="container">
 
       <h1 className="title">
-        <a target="_blank" href="https://github.com/Evmlink/Aptoslink-npm" rel="noreferrer">
-          Aptoslink{" "}
+        <a target="_blank" href="https://github.com/Evmlink/Evmlink-npm" rel="noreferrer">
+          Evmlink{" "}
         </a>
         Testnet Demo site
       </h1>
       <div className="grid">{webWalletExsitConnected ? webWalletExsit : ""}</div>
-      <div className="grid">{aptosWalletConnected ? aptosWalletConnectedView : ""}</div>
+      <div className="grid">{evmWalletConnected ? evmWalletConnectedView : ""}</div>
     <div>
 
       
@@ -331,7 +336,7 @@ function App() {
 
       <footer className="footer">
         <a
-          href="https://github.com/Evmlink/Aptoslink-npm"
+          href="https://github.com/Evmlink/Evmlink-npm"
           target="_blank"
           rel="noopener noreferrer"
         >
